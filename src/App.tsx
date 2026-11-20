@@ -46,6 +46,8 @@ import { exportObjectsToObj } from './core/io/objExport';
 import { parseObjContent } from './core/io/objImport';
 import { exportObjectsToStl } from './core/io/stlExport';
 import { inspectStlBuffer, parseStlBuffer } from './core/io/stlImport';
+import { exportObjectsToGlb } from './core/io/glbExport';
+import { parseGlbBuffer } from './core/io/glbImport';
 import { evaluateObjectsForExport } from './core/modifiers/evaluateModifiers';
 import {
   SidebarModuleId,
@@ -190,6 +192,8 @@ export default function App() {
   // Hidden file inputs mounted synchronously for iPad Safari compatibility
   const objInputRef = useRef<HTMLInputElement | null>(null);
   const stlInputRef = useRef<HTMLInputElement | null>(null);
+  const glbInputRef = useRef<HTMLInputElement | null>(null);
+  const externalImportInputRef = useRef<HTMLInputElement | null>(null);
   const jpgInputRef = useRef<HTMLInputElement | null>(null);
   const pngInputRef = useRef<HTMLInputElement | null>(null);
   const nativeProjectInputRef = useRef<HTMLInputElement | null>(null);
@@ -366,6 +370,59 @@ export default function App() {
     }
   }, []);
 
+  const handleGlbFileSelected = useCallback(
+    async (fileList: FileList | null) => {
+      if (!fileList || fileList.length === 0) return;
+      const file = fileList[0];
+      if (!file.name.toLowerCase().endsWith('.glb')) {
+        setIoError({
+          title: 'Archivo no compatible',
+          message: 'Selecciona un archivo 3D con extensión .glb.',
+        });
+        return;
+      }
+      if (file.size === 0) {
+        setIoError({ title: 'Archivo GLB vacío', message: `El archivo "${file.name}" está vacío.` });
+        return;
+      }
+      if (file.size > MAX_IMPORT_FILE_BYTES) {
+        setIoError({
+          title: 'Archivo demasiado grande',
+          message: `El archivo "${file.name}" supera el límite seguro de ${Math.round(MAX_IMPORT_FILE_BYTES / (1024 * 1024))} MB.`,
+        });
+        return;
+      }
+      try {
+        setIoProgress({
+          title: 'Importando modelo GLB',
+          label: `Leyendo "${file.name}"...`,
+          progress: 0.05,
+        });
+        const result = await parseGlbBuffer(await file.arrayBuffer(), file.name, {
+          onProgress: (progress, label) => {
+            setIoProgress({
+              title: 'Importando modelo GLB',
+              label,
+              progress,
+            });
+          },
+        });
+        store.importObjParts(result);
+        setIoProgress(null);
+      } catch (err) {
+        setIoProgress(null);
+        setIoError({
+          title: 'Error al importar GLB',
+          message:
+            err instanceof Error
+              ? err.message
+              : 'El archivo GLB está dañado o no pudo procesarse.',
+        });
+      }
+    },
+    [store],
+  );
+
   const handleConfirmStlImport = useCallback(
     async (scale: number) => {
       if (!pendingStl) return;
@@ -436,6 +493,53 @@ export default function App() {
       const objFile = files.find((f) => f.name.toLowerCase().endsWith('.obj'));
       const mtlFile = files.find((f) => f.name.toLowerCase().endsWith('.mtl'));
       const stlFile = files.find((f) => f.name.toLowerCase().endsWith('.stl'));
+      const glbFile = files.find((f) => f.name.toLowerCase().endsWith('.glb'));
+
+      if (glbFile) {
+        if (glbFile.size === 0) {
+          setIoError({
+            title: 'Archivo GLB vacío',
+            message: `El archivo "${glbFile.name}" está vacío.`,
+          });
+          return;
+        }
+        if (glbFile.size > MAX_IMPORT_FILE_BYTES) {
+          setIoError({
+            title: 'Archivo demasiado grande',
+            message: `El archivo "${glbFile.name}" supera el límite seguro de ${Math.round(MAX_IMPORT_FILE_BYTES / (1024 * 1024))} MB.`,
+          });
+          return;
+        }
+        try {
+          setIoProgress({
+            title: 'Importando modelo GLB a galería',
+            label: `Leyendo "${glbFile.name}"...`,
+            progress: 0.05,
+          });
+          const result = await parseGlbBuffer(await glbFile.arrayBuffer(), glbFile.name);
+          const modelProject = buildImportedModelProjectData({
+            projectName: stripFileExtension(glbFile.name),
+            folderId: targetFolderId,
+            objParts: result.parts,
+          });
+          const res = await store.importModelAsNewProject(modelProject);
+          setIoProgress(null);
+          if (!res.ok) {
+            setIoError({
+              title: 'Error al guardar modelo GLB',
+              message: res.error ?? 'No se pudo crear el proyecto en la galería.',
+            });
+            return;
+          }
+        } catch (err) {
+          setIoProgress(null);
+          setIoError({
+            title: 'Error al importar GLB',
+            message: err instanceof Error ? err.message : 'No se pudo procesar el archivo GLB.',
+          });
+        }
+        return;
+      }
 
       if (objFile) {
         if (objFile.size === 0) {
@@ -543,7 +647,7 @@ export default function App() {
       setIoError({
         title: 'Formato no compatible',
         message:
-          'Selecciona un modelo .obj (opcionalmente con .mtl) o un archivo .stl.',
+          'Selecciona un modelo .obj (opcionalmente con .mtl), .stl o .glb.',
       });
     },
     [store],
@@ -567,6 +671,36 @@ export default function App() {
       }
     },
     [],
+  );
+
+  const handleExternalImportSelected = useCallback(
+    async (fileList: FileList | null) => {
+      if (!fileList || fileList.length === 0) return;
+      const file = fileList[0];
+      const lowerName = file.name.toLowerCase();
+      if (lowerName.endsWith('.obj')) {
+        await handleObjFilesSelected(fileList);
+      } else if (lowerName.endsWith('.stl')) {
+        await handleStlFileSelected(fileList);
+      } else if (lowerName.endsWith('.glb')) {
+        await handleGlbFileSelected(fileList);
+      } else if (lowerName.endsWith('.png')) {
+        await handleImageFileSelected(fileList, 'png');
+      } else if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg')) {
+        await handleImageFileSelected(fileList, 'jpg');
+      } else {
+        setIoError({
+          title: 'Formato no compatible',
+          message: 'Selecciona OBJ, STL, GLB, PNG, JPG o JPEG.',
+        });
+      }
+    },
+    [
+      handleGlbFileSelected,
+      handleImageFileSelected,
+      handleObjFilesSelected,
+      handleStlFileSelected,
+    ],
   );
 
   const handleConfirmReferenceImage = useCallback(
@@ -646,7 +780,7 @@ export default function App() {
           store.showToast(
             `OBJ exportado: ${result.exportedCount} objeto(s)${skippedMsg}`,
           );
-        } else {
+        } else if (config.format === 'stl') {
           setIoProgress({
             title: 'Exportando modelo STL',
             label: 'Verificando y triangulando mallas...',
@@ -678,6 +812,37 @@ export default function App() {
               : '';
           store.showToast(
             `STL exportado (${result.totalTriangles.toLocaleString()} triángulos)${skippedMsg}`,
+          );
+        } else {
+          setIoProgress({
+            title: 'Exportando modelo GLB',
+            label: 'Preparando geometría...',
+            progress: 0.1,
+          });
+          const result = await exportObjectsToGlb(evaluatedTargets, {
+            applyTransform: config.applyTransform,
+            exportScale: config.exportScale,
+            materials: store.materials,
+            onProgress: (progress, label) => {
+              setIoProgress({
+                title: 'Exportando modelo GLB',
+                label,
+                progress,
+              });
+            },
+          });
+          triggerFileDownload(
+            result.data,
+            `${baseFilename}.glb`,
+            'model/gltf-binary',
+          );
+          setIoProgress(null);
+          const skippedMsg =
+            result.skippedObjects.length > 0
+              ? ` (${result.skippedObjects.length} omitido(s))`
+              : '';
+          store.showToast(
+            `GLB exportado: ${result.exportedCount} objeto(s)${skippedMsg}`,
           );
         }
       } catch (err) {
@@ -1207,6 +1372,17 @@ export default function App() {
     <div className="w-screen h-screen flex flex-col bg-[#18191c] text-[#e4e6eb] overflow-hidden select-none">
       {/* Hidden Safari iPad-compatible file pickers (invoked synchronously inside menu clicks) */}
       <input
+        ref={externalImportInputRef}
+        type="file"
+        accept=".obj,.mtl,.stl,.glb,.png,.jpg,.jpeg,image/png,image/jpeg"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          void handleExternalImportSelected(e.target.files);
+          e.target.value = '';
+        }}
+      />
+      <input
         ref={objInputRef}
         type="file"
         accept=".obj,.mtl"
@@ -1290,6 +1466,10 @@ export default function App() {
           onExportNativeProject={() => {
             void handleExportNativeFromModeler();
           }}
+          onImportExternal={() => externalImportInputRef.current?.click()}
+          onExportExternal={() =>
+            openExportModal('obj', store.selectedObjectId ? 'selected' : 'scene')
+          }
           onOpenSettingsModal={() => setSettingsModalTab('touch')}
           onImportObj={() => objInputRef.current?.click()}
           onImportStl={() => stlInputRef.current?.click()}
@@ -1867,6 +2047,10 @@ export default function App() {
               onExportNativeProject={() => {
                 void handleExportNativeFromModeler();
               }}
+              onImportExternal={() => externalImportInputRef.current?.click()}
+              onExportExternal={() =>
+                openExportModal('obj', store.selectedObjectId ? 'selected' : 'scene')
+              }
               onImportObj={() => objInputRef.current?.click()}
               onImportStl={() => stlInputRef.current?.click()}
               onImportJpg={() => jpgInputRef.current?.click()}

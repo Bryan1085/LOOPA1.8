@@ -791,11 +791,11 @@ export const ProjectGallery: React.FC<ProjectGalleryProps> = ({
         }}
       />
 
-      {/* Hidden 3D model importer (OBJ + optional MTL, STL) */}
+      {/* Hidden 3D model importer (OBJ + optional MTL, STL, GLB) */}
       <input
         ref={modelImportInputRef}
         type="file"
-        accept=".obj,.mtl,.stl"
+        accept=".obj,.mtl,.stl,.glb"
         multiple
         className="hidden"
         onChange={(e) => {

@@ -130,6 +130,8 @@ interface FloatingRadialPairProps {
   onSaveAsProjectModal: () => void;
   onImportNativeProject: () => void;
   onExportNativeProject: () => void;
+  onImportExternal: () => void;
+  onExportExternal: () => void;
   onImportObj: () => void;
   onImportStl: () => void;
   onImportJpg: () => void;
@@ -235,6 +237,8 @@ export const FloatingRadialPair: React.FC<FloatingRadialPairProps> = ({
   onSaveAsProjectModal,
   onImportNativeProject,
   onExportNativeProject,
+  onImportExternal,
+  onExportExternal,
   onImportObj,
   onImportStl,
   onImportJpg,
@@ -370,6 +374,8 @@ export const FloatingRadialPair: React.FC<FloatingRadialPairProps> = ({
     onSaveAsProjectModal,
     onImportNativeProject,
     onExportNativeProject,
+    onImportExternal,
+    onExportExternal,
     onImportObj,
     onImportStl,
     onImportJpg,

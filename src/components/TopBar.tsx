@@ -89,6 +89,8 @@ interface TopBarProps {
   onSaveAsProjectModal: () => void;
   onImportNativeProject: () => void;
   onExportNativeProject: () => void;
+  onImportExternal: () => void;
+  onExportExternal: () => void;
   onOpenSettingsModal: () => void;
   onImportObj: () => void;
   onImportStl: () => void;
@@ -180,6 +182,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   onSaveAsProjectModal,
   onImportNativeProject,
   onExportNativeProject,
+  onImportExternal,
+  onExportExternal,
   onOpenSettingsModal,
   onImportObj,
   onImportStl,
@@ -562,141 +566,40 @@ export const TopBar: React.FC<TopBarProps> = ({
               <div className="my-1 border-t border-[#272b34]" />
 
               <div className="px-2.5 pt-1 pb-0.5 text-[11px] font-semibold text-[#8e95a2] flex items-center gap-1.5">
-                <Upload className="w-3.5 h-3.5 text-[#5ecd6e]" />
-                <span>Importar</span>
+                <Download className="w-3.5 h-3.5 text-[#5ecd6e]" />
+                <span>Archivo externo</span>
               </div>
               <button
                 type="button"
                 role="menuitem"
                 onClick={() => {
                   setOpenMenu(null);
-                  onImportNativeProject();
+                  onImportExternal();
                 }}
                 className="w-full min-h-[38px] px-2.5 rounded-lg hover:bg-[#252932] text-xs font-medium text-[#e4e6eb] flex items-center gap-2.5 text-left transition-colors"
               >
-                <Upload className="w-4 h-4 text-[#5ecd6e] shrink-0" />
-                <span>Proyecto (.forma3d / .json)</span>
+                <Download className="w-4 h-4 text-[#5ecd6e] shrink-0" />
+                <span>IMPORTAR</span>
               </button>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onImportObj();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <FileBox className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
-                  <span>OBJ</span>
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onImportStl();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <FileBox className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
-                  <span>STL</span>
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onImportJpg();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <ImageIcon className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
-                  <span>JPG</span>
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onImportPng();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <ImageIcon className="w-3.5 h-3.5 text-[#60a5fa] shrink-0" />
-                  <span>PNG</span>
-                </button>
-              </div>
 
               <div className="my-1 border-t border-[#272b34]" />
 
               <div className="px-2.5 pt-1 pb-0.5 text-[11px] font-semibold text-[#8e95a2] flex items-center gap-1.5">
-                <Download className="w-3.5 h-3.5 text-[#5ecd6e]" />
-                <span>Exportar</span>
+                <Upload className="w-3.5 h-3.5 text-[#5ecd6e]" />
+                <span>Archivo externo</span>
               </div>
               <button
                 type="button"
                 role="menuitem"
                 onClick={() => {
                   setOpenMenu(null);
-                  onExportNativeProject();
+                  onExportExternal();
                 }}
                 className="w-full min-h-[38px] px-2.5 rounded-lg hover:bg-[#252932] text-xs font-medium text-[#e4e6eb] flex items-center gap-2.5 text-left transition-colors"
               >
-                <Download className="w-4 h-4 text-[#34d399] shrink-0" />
-                <span>Proyecto completo</span>
+                <Upload className="w-4 h-4 text-[#34d399] shrink-0" />
+                <span>EXPORTAR</span>
               </button>
-              <div className="grid grid-cols-2 gap-1">
-                <button
-                  type="button"
-                  role="menuitem"
-                  disabled={!hasSelectedObject}
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onExportSelected();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] disabled:opacity-40 disabled:pointer-events-none text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Box className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
-                  <span className="truncate">Seleccionado</span>
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onExportScene();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Layers className="w-3.5 h-3.5 text-[#a78bfa] shrink-0" />
-                  <span className="truncate">Escena</span>
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onExportObj();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#cbd5e1] shrink-0" />
-                  <span>OBJ</span>
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onExportStl();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
-                  <span>STL</span>
-                </button>
-              </div>
 
               <div className="my-1 border-t border-[#272b34]" />
 

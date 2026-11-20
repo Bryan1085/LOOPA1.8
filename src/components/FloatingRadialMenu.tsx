@@ -196,6 +196,8 @@ export interface FloatingRadialMenuProps {
   onSaveAsProjectModal?: () => void;
   onImportNativeProject?: () => void;
   onExportNativeProject?: () => void;
+  onImportExternal?: () => void;
+  onExportExternal?: () => void;
   onImportObj?: () => void;
   onImportStl?: () => void;
   onImportJpg?: () => void;
@@ -367,6 +369,8 @@ export const FloatingRadialMenu: React.FC<FloatingRadialMenuProps> = ({
   onSaveAsProjectModal,
   onImportNativeProject,
   onExportNativeProject,
+  onImportExternal,
+  onExportExternal,
   onImportObj,
   onImportStl,
   onImportJpg,
@@ -1816,59 +1820,13 @@ export const FloatingRadialMenu: React.FC<FloatingRadialMenuProps> = ({
                 type="button"
                 onClick={() => {
                   closeAll();
-                  onImportNativeProject?.();
+                  onImportExternal?.();
                 }}
                 className="w-full min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 text-left transition-colors"
               >
-                <Upload className="w-4 h-4 text-[#5ecd6e] shrink-0" />
-                <span>Proyecto (.forma3d / .json)</span>
+                <Download className="w-4 h-4 text-[#5ecd6e] shrink-0" />
+                <span>IMPORTAR</span>
               </button>
-              <div className="grid grid-cols-2 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onImportObj?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <FileBox className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
-                  <span>OBJ</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onImportStl?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <FileBox className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
-                  <span>STL</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onImportJpg?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <ImageIcon className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
-                  <span>JPG</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onImportPng?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <ImageIcon className="w-3.5 h-3.5 text-[#60a5fa] shrink-0" />
-                  <span>PNG</span>
-                </button>
-              </div>
             </div>
           )}
 
@@ -1914,53 +1872,17 @@ export const FloatingRadialMenu: React.FC<FloatingRadialMenuProps> = ({
                 <Download className="w-4 h-4 text-[#34d399] shrink-0" />
                 <span>Proyecto completo (.forma3d)</span>
               </button>
-              <div className="grid grid-cols-2 gap-1.5">
-                <button
-                  type="button"
-                  disabled={!hasSelectedObject}
-                  onClick={() => {
-                    closeAll();
-                    onExportSelected?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] disabled:opacity-40 disabled:pointer-events-none text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Box className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
-                  <span className="truncate">Seleccionado</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onExportScene?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Layers className="w-3.5 h-3.5 text-[#a78bfa] shrink-0" />
-                  <span className="truncate">Escena</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onExportObj?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#cbd5e1] shrink-0" />
-                  <span>OBJ</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onExportStl?.();
-                  }}
-                  className="min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
-                  <span>STL</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  closeAll();
+                  onExportExternal?.();
+                }}
+                className="w-full min-h-[38px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-xs font-medium text-[#e4e6eb] flex items-center gap-2 text-left transition-colors"
+              >
+                <Upload className="w-4 h-4 text-[#34d399] shrink-0" />
+                <span>EXPORTAR</span>
+              </button>
             </div>
           )}
 

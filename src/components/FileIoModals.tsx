@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   Check,
   Download,
+  Upload,
   FileBox,
   Image as ImageIcon,
   Info,
@@ -28,7 +29,7 @@ export interface PendingStlImport {
 }
 
 export type ExportScope = 'selected' | 'multiple' | 'scene';
-export type ExportFormat = 'obj' | 'stl';
+export type ExportFormat = 'obj' | 'stl' | 'glb';
 
 export interface ExportRequestConfig {
   format: ExportFormat;
@@ -283,7 +284,7 @@ export const ReferenceImageImportModal: React.FC<{
 };
 
 /* ============================================================================
- * Export Model Modal (OBJ / STL with Diagnostics & Compatibility Check)
+ * Export Model Modal (OBJ / STL / GLB with Diagnostics & Compatibility Check)
  * ========================================================================== */
 export const ExportModelModal: React.FC<{
   initialFormat: ExportFormat;
@@ -346,6 +347,7 @@ export const ExportModelModal: React.FC<{
     validScale &&
     objReport.validMeshes.length > 0 &&
     (format === 'obj' ||
+      format === 'glb' ||
       (stlValidation !== null && stlValidation.blockingErrors.length === 0));
 
   const toggleMultiId = (id: string) => {
@@ -359,7 +361,7 @@ export const ExportModelModal: React.FC<{
       <div className="w-full max-w-lg max-h-[90vh] rounded-xl bg-[#181a1f] border border-[#2f3440] shadow-2xl flex flex-col overflow-hidden">
         <div className="px-4 py-3 border-b border-[#262931] flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2">
-            <Download className="w-4 h-4 text-[#5ecd6e]" />
+            <Upload className="w-4 h-4 text-[#5ecd6e]" />
             <h2 className="text-sm font-semibold text-[#f3f4f6]">
               Exportar modelo 3D
             </h2>
@@ -378,7 +380,7 @@ export const ExportModelModal: React.FC<{
           {/* Format Selector */}
           <div className="space-y-1.5">
             <div className="text-xs font-medium text-[#d1d5db]">Formato</div>
-            <div className="grid grid-cols-2 gap-1.5 p-1 rounded-lg bg-[#111317] border border-[#262931]">
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-lg bg-[#111317] border border-[#262931]">
               <button
                 type="button"
                 onClick={() => setFormat('obj')}
@@ -400,6 +402,17 @@ export const ExportModelModal: React.FC<{
                 }`}
               >
                 STL (Malla triangular)
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormat('glb')}
+                className={`h-9 rounded-md text-xs font-semibold transition-colors ${
+                  format === 'glb'
+                    ? 'bg-[#2a2f3a] text-[#5ecd6e]'
+                    : 'text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                GLB (3D binario)
               </button>
             </div>
           </div>
@@ -678,7 +691,7 @@ export const ExportModelModal: React.FC<{
               }
               className="h-10 px-4 rounded-md bg-[#49b459] hover:bg-[#5ecd6e] disabled:opacity-40 text-xs font-semibold text-[#111215] flex items-center gap-1.5 transition-colors"
             >
-              <Download className="w-4 h-4" />
+              <Upload className="w-4 h-4" />
               <span>Exportar {format.toUpperCase()}</span>
             </button>
           </div>
