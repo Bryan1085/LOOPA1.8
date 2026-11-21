@@ -82,6 +82,7 @@ interface TopBarProps {
   projection: CameraProjection;
   showLiner: boolean;
   sceneStats?: SceneStatsInfo;
+  demoMode?: boolean;
   onReturnToGallery: () => void;
   onCreateProjectModal: () => void;
   onOpenProjectModal: () => void;
@@ -175,6 +176,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   projection,
   showLiner,
   sceneStats,
+  demoMode = false,
   onReturnToGallery,
   onCreateProjectModal,
   onOpenProjectModal,
@@ -270,7 +272,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           data-testid="loopa-home-logo-btn"
           onClick={() => {
             setOpenMenu(null);
-            onReturnToGallery();
+            if (!demoMode) onReturnToGallery();
           }}
           aria-label={`Volver a la galería de ${APP_NAME}`}
           title={`Volver a la galería de proyectos (${APP_NAME})`}
@@ -506,7 +508,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <span>Nuevo proyecto</span>
               </button>
 
-              <button
+              {!demoMode && <button
                 type="button"
                 role="menuitem"
                 data-testid="menu-file-open"
@@ -518,7 +520,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               >
                 <FolderOpen className="w-4 h-4 text-[#5ecd6e] shrink-0" />
                 <span>Abrir proyecto</span>
-              </button>
+              </button>}
 
               <button
                 type="button"
@@ -549,7 +551,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 )}
               </button>
 
-              <button
+              {!demoMode && <button
                 type="button"
                 role="menuitem"
                 data-testid="menu-file-save-as"
@@ -561,7 +563,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               >
                 <CopyPlus className="w-4 h-4 text-[#cbd5e1] shrink-0" />
                 <span>Guardar como</span>
-              </button>
+              </button>}
 
               <div className="my-1 border-t border-[#272b34]" />
 
@@ -582,24 +584,25 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <span>IMPORTAR</span>
               </button>
 
-              <div className="my-1 border-t border-[#272b34]" />
-
-              <div className="px-2.5 pt-1 pb-0.5 text-[11px] font-semibold text-[#8e95a2] flex items-center gap-1.5">
-                <Upload className="w-3.5 h-3.5 text-[#5ecd6e]" />
-                <span>Archivo externo</span>
-              </div>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => {
-                  setOpenMenu(null);
-                  onExportExternal();
-                }}
-                className="w-full min-h-[38px] px-2.5 rounded-lg hover:bg-[#252932] text-xs font-medium text-[#e4e6eb] flex items-center gap-2.5 text-left transition-colors"
-              >
-                <Upload className="w-4 h-4 text-[#34d399] shrink-0" />
-                <span>EXPORTAR</span>
-              </button>
+              {!demoMode && <>
+                <div className="my-1 border-t border-[#272b34]" />
+                <div className="px-2.5 pt-1 pb-0.5 text-[11px] font-semibold text-[#8e95a2] flex items-center gap-1.5">
+                  <Upload className="w-3.5 h-3.5 text-[#5ecd6e]" />
+                  <span>Archivo externo</span>
+                </div>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onExportExternal();
+                  }}
+                  className="w-full min-h-[38px] px-2.5 rounded-lg hover:bg-[#252932] text-xs font-medium text-[#e4e6eb] flex items-center gap-2.5 text-left transition-colors"
+                >
+                  <Upload className="w-4 h-4 text-[#34d399] shrink-0" />
+                  <span>EXPORTAR</span>
+                </button>
+              </>}
 
               <div className="my-1 border-t border-[#272b34]" />
 

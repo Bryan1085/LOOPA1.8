@@ -65,6 +65,7 @@ import {
   TouchModifierState,
 } from './core/project/types';
 import { getAppDocumentTitle } from './config/brand';
+import { DEMO_MODE } from './config/demo';
 import { EMPTY_MODIFIER_STATE } from './engine/TouchGestureManager';
 import { useModelerStore } from './state/useModelerStore';
 
@@ -72,7 +73,7 @@ export default function App() {
   const store = useModelerStore();
 
   const [activeView, setActiveView] = useState<'gallery' | WorkspaceId>(
-    'gallery',
+    DEMO_MODE ? 'layout' : 'gallery',
   );
   const [showReturnGuardModal, setShowReturnGuardModal] = useState(false);
   const [exitingToGallery, setExitingToGallery] = useState(false);
@@ -717,6 +718,10 @@ export default function App() {
    * ======================================================================== */
   const openExportModal = useCallback(
     (format: ExportFormat, scope: ExportScope) => {
+      if (DEMO_MODE) {
+        store.showToast('La exportación no está disponible en la demo');
+        return;
+      }
       if (scope === 'selected' && !store.selectedObjectId) {
         store.showToast('Selecciona un objeto o exporta la escena completa');
         return;
@@ -912,6 +917,10 @@ export default function App() {
   );
 
   const handleReturnToGallery = useCallback(async () => {
+    if (DEMO_MODE) {
+      store.showToast('La galería no está disponible en la demo');
+      return;
+    }
     if (exitingToGallery) return;
     if (store.hasUnsavedChanges) {
       if (store.settings.autosaveEnabled) {
@@ -935,6 +944,10 @@ export default function App() {
   }, [exitingToGallery, store]);
 
   const handleExportNativeFromModeler = useCallback(async () => {
+    if (DEMO_MODE) {
+      store.showToast('La exportación no está disponible en la demo');
+      return;
+    }
     const res = await store.exportNativeProject();
     if (!res) return;
     triggerFileDownload(
@@ -1437,6 +1450,7 @@ export default function App() {
       {/* A. BARHOME — Barra superior independiente con logo permanente de LOOPA */}
       {activeView !== 'gallery' && (
         <TopBar
+          demoMode={DEMO_MODE}
           barhomeVisible={toolbarPrefs.barhomeVisible}
           onToggleBarhome={handleToggleBarhome}
           projectName={store.project.name}
@@ -1541,6 +1555,7 @@ export default function App() {
 
       {activeView === 'timelapse' && (
         <TimelapseModal
+          demoMode={DEMO_MODE}
           variant="workspace"
           reserveTopLeftCorner={!toolbarPrefs.barhomeVisible}
           projectId={store.project.id}
@@ -1921,6 +1936,7 @@ export default function App() {
           store.settings.touch.floatingMenuEnabled &&
           !store.operatorSession && (
             <FloatingRadialPair
+              demoMode={DEMO_MODE}
               activeWorkspace={activeView}
               boundsClassName={radialBoundsClass}
               touchSettings={store.settings.touch}
@@ -2079,7 +2095,7 @@ export default function App() {
       </div>
 
       {/* Project Gallery Launch Screen Overlay (preserves single ViewportEngine instance underneath) */}
-      {activeView === 'gallery' && (
+      {!DEMO_MODE && activeView === 'gallery' && (
         <ProjectGallery
           projects={store.savedProjects}
           folders={store.folders}
@@ -2167,7 +2183,7 @@ export default function App() {
           onCancel={() => setShowReturnGuardModal(false)}
           onDiscardAndExit={() => {
             setShowReturnGuardModal(false);
-            setActiveView('gallery');
+            setActiveView(DEMO_MODE ? 'layout' : 'gallery');
           }}
           onSaveAndExit={async () => {
             setExitingToGallery(true);
@@ -2175,7 +2191,7 @@ export default function App() {
             setExitingToGallery(false);
             if (ok) {
               setShowReturnGuardModal(false);
-              setActiveView('gallery');
+              setActiveView(DEMO_MODE ? 'layout' : 'gallery');
             }
           }}
         />
@@ -2235,6 +2251,7 @@ export default function App() {
 
       {timelapseTarget && (
         <TimelapseModal
+          demoMode={DEMO_MODE}
           projectId={timelapseTarget.id}
           projectName={timelapseTarget.name}
           isActiveProject={timelapseTarget.id === store.project.id}

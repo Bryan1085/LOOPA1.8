@@ -124,6 +124,7 @@ interface FloatingRadialPairProps {
   uvActionsRef?: React.RefObject<UVWorkspaceHandle | null>;
 
   // BARHOME handlers
+  demoMode?: boolean;
   onCreateProjectModal: () => void;
   onOpenProjectModal: () => void;
   onSaveProject: () => void;
@@ -147,6 +148,7 @@ interface FloatingRadialPairProps {
 
 export const FloatingRadialPair: React.FC<FloatingRadialPairProps> = ({
   activeWorkspace,
+  demoMode = false,
   boundsClassName = 'left-0 right-0',
   touchSettings,
   onUpdateTouchSettings,
@@ -283,6 +285,7 @@ export const FloatingRadialPair: React.FC<FloatingRadialPairProps> = ({
 
   const sharedProps = {
     containerRef,
+    demoMode,
     activeWorkspace,
     workMode,
     editSelectionMode,

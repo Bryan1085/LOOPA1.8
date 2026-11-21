@@ -190,6 +190,7 @@ export interface FloatingRadialMenuProps {
   uvActionsRef?: React.RefObject<UVWorkspaceHandle | null>;
 
   // BARHOME handlers
+  demoMode?: boolean;
   onCreateProjectModal?: () => void;
   onOpenProjectModal?: () => void;
   onSaveProject: () => void;
@@ -266,6 +267,7 @@ const WORKSPACE_OPTIONS: {
 
 export const FloatingRadialMenu: React.FC<FloatingRadialMenuProps> = ({
   containerRef,
+  demoMode = false,
   menuKind = 'tools',
   layoutScope,
   slots,
@@ -1831,7 +1833,7 @@ export const FloatingRadialMenu: React.FC<FloatingRadialMenuProps> = ({
           )}
 
           {/* BARHOME Sub-Picker Popover: Exportar & Guardar como */}
-          {activeSubPicker === 'barhome_export' && (
+          {!demoMode && activeSubPicker === 'barhome_export' && (
             <div
               style={{ left: popoverLeft, top: popoverTop }}
               onPointerDown={(e) => e.stopPropagation()}
@@ -2235,18 +2237,20 @@ export const FloatingRadialMenu: React.FC<FloatingRadialMenuProps> = ({
                   <PanelTop className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
                   <span>{barhomeVisible ? 'Ocultar BARHOME' : 'Mostrar BARHOME'}</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeAll();
-                    onReturnToGallery?.();
-                  }}
-                  className="min-h-[34px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-[11px] font-medium text-[#cbd5e1] flex items-center justify-center gap-1.5 transition-colors"
-                  title="Volver a la Galería"
-                >
-                  <Home className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
-                  <span>Galería</span>
-                </button>
+                {!demoMode && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeAll();
+                      onReturnToGallery?.();
+                    }}
+                    className="min-h-[34px] px-2.5 rounded-lg bg-[#1e2128] hover:bg-[#272b35] text-[11px] font-medium text-[#cbd5e1] flex items-center justify-center gap-1.5 transition-colors"
+                    title="Volver a la Galería"
+                  >
+                    <Home className="w-3.5 h-3.5 text-[#5ecd6e] shrink-0" />
+                    <span>Galería</span>
+                  </button>
+                )}
               </div>
             </div>
           )}

@@ -55,6 +55,7 @@ import {
 } from '../core/timelapse/types';
 
 interface TimelapseModalProps {
+  demoMode?: boolean;
   projectId: string;
   projectName: string;
   isActiveProject: boolean;
@@ -81,6 +82,7 @@ function formatElapsedSeconds(seconds: number): string {
 }
 
 export const TimelapseModal: React.FC<TimelapseModalProps> = ({
+  demoMode = false,
   projectId,
   projectName,
   isActiveProject,
@@ -859,7 +861,7 @@ export const TimelapseModal: React.FC<TimelapseModalProps> = ({
               </div>
             </div>
 
-            {/* MP4 Export Card */}
+            {!demoMode && (
             <div className="rounded-xl bg-[#1c1f26] border border-[#2d313c] p-3 space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -1061,6 +1063,7 @@ export const TimelapseModal: React.FC<TimelapseModalProps> = ({
                 </>
               )}
             </div>
+            )}
 
             {/* Storage & History Management */}
             <div className="rounded-xl bg-[#1c1f26] border border-[#2d313c] p-3 space-y-2.5">
